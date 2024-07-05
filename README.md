@@ -27,6 +27,8 @@ cd ~/backup
 ## Ana Script'i Çalıştırın
 Tüm kurulumları ve yapılandırmaları otomatik olarak gerçekleştirmek için setup_new_machine.sh script'ini çalıştırın:
 
+```./setup_new_machine.sh```
+
 Bu script aşağıdaki adımları gerçekleştirecektir:
 
 - Homebrew'ü kurar.
