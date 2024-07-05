@@ -21,7 +21,7 @@ Yeni bilgisayarınızda terminali açın ve bu depoyu klonlayın:
 
 ```sh
 git clone https://github.com/ysndmr/backup-scripts.git ~/backup
-cd ~/backup
+cd ~/backup ```
 
 ###.  Ana Script'i Çalıştırın
 Script'in çalıştırılabilir olduğundan emin olun:
