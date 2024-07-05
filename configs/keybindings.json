@@ -1,0 +1,13 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "shift+m shift+r",
+        "command": "extension.openMR",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+k cmd+m",
+        "command": "-extension.openMR",
+        "when": "editorTextFocus"
+    }
+]

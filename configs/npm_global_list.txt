@@ -1,0 +1,4 @@
+/opt/homebrew/lib
+├── npm@10.2.4
+└── yarn@1.22.21
+
