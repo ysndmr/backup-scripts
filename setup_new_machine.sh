@@ -13,12 +13,12 @@ echo "jq kuruluyor..."
 brew install jq
 
 echo "Homebrew paketleri yükleniyor..."
-brew bundle --file=~/backup/Brewfile
+brew bundle --file=~/backup/configs/Brewfile
 
 echo "Uygulamalar kuruluyor..."
 while read -r application; do
     brew install --cask "$application"
-done < ~/backup/applications_list.txt
+done < ~/backup/configs/applications_list.txt
 
 echo "Yedek dosyaları GitHub'dan klonlanıyor..."
 git clone https://github.com/ysndmr/backup-scripts.git ~/backup
