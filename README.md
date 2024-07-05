@@ -22,3 +22,23 @@ Yeni bilgisayarınızda terminali açın ve bu depoyu klonlayın:
 ```sh
 git clone https://github.com/ysndmr/backup-scripts.git ~/backup
 cd ~/backup
+
+###.  Ana Script'i Çalıştırın
+Script'in çalıştırılabilir olduğundan emin olun:
+
+```sh
+chmod +x setup_new_machine.sh
+
+Tüm kurulumları ve yapılandırmaları otomatik olarak gerçekleştirmek için setup_new_machine.sh script'ini çalıştırın:
+
+```sh
+./setup_new_machine.sh
+
+Bu script aşağıdaki adımları gerçekleştirecektir:
+
+Homebrew'ü kurar.
+Git, Node.js, npm ve jq'yu kurar.
+Homebrew ile yedeklenen paketleri Brewfile kullanarak kurar.
+applications_list.txt dosyasındaki uygulamaları Homebrew ile kurar.
+Yapılandırma dosyalarını geri yükler (backup_all.sh script'i ile).
+GitLab projelerini klonlar (clone_gitlab_projects.sh script'i ile).
