@@ -158,7 +158,7 @@ Bu parametre, GitLab projelerinin klonlanma adımını atlar.
 ```
 
 2. `--no-vscode`
-Bu parametre, GitLab projelerinin klonlanma adımını atlar.
+Bu parametre, VS Code kurulum adımını atlar.
 ```sh
 ./setup_new_machine.sh --no-vscode
 ```
