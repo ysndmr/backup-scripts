@@ -25,17 +25,17 @@ done
 if [ "$LIST_PROJECTS" = true ]; then
     echo "Listing GitLab projects..."
     response=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100")
-    projects=$(echo "$response" | jq -r '.[].name_with_namespace')
+    projects=$(echo "$response" | jq -r '.[] | .name_with_namespace')
     if [ -z "$projects" ]; then
         echo "No projects found or there was an error retrieving the projects."
         echo "API Response: $response"
         exit 1
     fi
     i=1
-    for project in $projects; do
+    while IFS= read -r project; do
         echo "$i. $project"
         i=$((i+1))
-    done
+    done <<< "$projects"
     exit 0
 fi
 
@@ -120,7 +120,7 @@ if [ "$SKIP_GITLAB" = false ]; then
         exit 1
     fi
     i=1
-    for project in $projects; do
+    while IFS= read -r project; do
       if [[ ",$SKIP_PROJECTS," != *",$i,"* ]]; then
         echo "Cloning: $project"
         git clone "$project" "$PROJECTS_DIR/$(basename $project .git)" || echo "Failed to clone $project, skipping."
@@ -128,7 +128,7 @@ if [ "$SKIP_GITLAB" = false ]; then
         echo "Skipping project number $i."
       fi
       i=$((i+1))
-    done
+    done <<< "$projects"
   else
     echo "GitLab projects already cloned, skipping."
   fi
