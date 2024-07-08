@@ -1,15 +1,8 @@
-1Password.app
-AWS VPN Client
-AnyDesk.app
-Arc.app
-Backblaze.app
-BackblazeRestore.app
-DBeaver.app
-Docker.app
-Firefox.app
-Google Chrome.app
-Safari.app
-Slack.app
-Utilities
-iTerm.app
-zoom.us.app
+backblaze
+dbeaver
+docker
+firefox
+google-chrome
+slack
+iterm2
+zoom
