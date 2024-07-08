@@ -6,6 +6,10 @@ SKIP_VSCODE=false
 LIST_PROJECTS=false
 SKIP_PROJECTS=""
 
+# GitLab ayarları
+GITLAB_GROUP="success-factory-development"  # URL'den alınan grup adı
+GITLAB_PRIVATE_TOKEN="glpat-WsFRAWDYwLcLnKQPzzBs"  # Oluşturduğunuz kişisel erişim tokenı
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --none) SKIP_GITLAB=true ;;
@@ -20,9 +24,11 @@ done
 # Eğer --projects parametresi verilmişse sadece projeleri listele ve çık
 if [ "$LIST_PROJECTS" = true ]; then
     echo "Listing GitLab projects..."
-    projects=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100" | jq -r '.[].name_with_namespace')
+    response=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100")
+    projects=$(echo "$response" | jq -r '.[].name_with_namespace')
     if [ -z "$projects" ]; then
         echo "No projects found or there was an error retrieving the projects."
+        echo "API Response: $response"
         exit 1
     fi
     i=1
