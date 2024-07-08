@@ -1,36 +1,38 @@
 #!/bin/bash
 
-echo "Homebrew kuruluyor..."
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Homebrew'ü kurar
+if ! command -v brew &> /dev/null
+then
+  echo "Homebrew yükleniyor..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
 
-echo "Git kuruluyor..."
-brew install git
+# Gerekli paketleri yükler
+echo "Gerekli paketler yükleniyor..."
+brew install git node npm jq
 
-echo "Node.js ve npm kuruluyor..."
-brew install node
-
-echo "jq kuruluyor..."
-brew install jq
-
+# Brewfile'daki paketleri yükler
 echo "Homebrew paketleri yükleniyor..."
-brew bundle --file=~/backup/configs/Brewfile
+brew bundle --file=./configs/Brewfile
 
+# applications_list.txt dosyasındaki uygulamaları yükler
 echo "Uygulamalar kuruluyor..."
-while read -r application; do
-    brew install --cask "$application"
-done < ~/backup/configs/applications_list.txt
+while IFS= read -r application
+do
+  brew install --cask "$application"
+done < ./configs/applications_list.txt
 
-echo "Yedek dosyaları GitHub'dan klonlanıyor..."
-git clone https://github.com/ysndmr/backup-scripts.git ~/backup
-cd ~/backup
-
+# Yapılandırma dosyalarını geri yükler
 echo "Yapılandırma dosyaları geri yükleniyor..."
-chmod +x configs/backup_all.sh
 ./configs/backup_all.sh
 
-echo "GitLab projeleri klonlanıyor..."
-chmod +x configs/clone_gitlab_projects.sh
-./configs/clone_gitlab_projects.sh
+# GitLab projelerinin zaten klonlanıp klonlanmadığını kontrol eder ve gerekirse klonlar
+PROJECTS_DIR="$HOME/Desktop/Projects"
+if [ ! -d "$PROJECTS_DIR" ] || [ -z "$(ls -A $PROJECTS_DIR)" ]; then
+  echo "GitLab projeleri klonlanıyor..."
+  ./configs/clone_gitlab_projects.sh
+else
+  echo "GitLab projeleri zaten klonlanmış, atlanıyor."
+fi
 
 echo "Kurulum tamamlandı!"
-
