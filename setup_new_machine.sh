@@ -21,21 +21,46 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+# Ortak kısmı belirlemek için yardımcı fonksiyon
+find_common_prefix() {
+    # İlk projeyi ortak kısım olarak başlat
+    local prefix=$1
+    shift
+    for name in "$@"; do
+        while [[ "${name#$prefix}" == "$name" ]]; do
+            prefix=${prefix%?}
+        done
+    done
+    echo "$prefix"
+}
+
 # Eğer --projects parametresi verilmişse sadece projeleri listele ve çık
 if [ "$LIST_PROJECTS" = true ]; then
     echo "Listing GitLab projects..."
     response=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100")
-    projects=$(echo "$response" | jq -r '.[] | .name_with_namespace')
+    projects=$(echo "$response" | jq -r '.[].name_with_namespace')
     if [ -z "$projects" ]; then
         echo "No projects found or there was an error retrieving the projects."
         echo "API Response: $response"
         exit 1
     fi
-    i=1
+
+    # Proje isimlerini diziye al
+    project_array=()
     while IFS= read -r project; do
-        echo "$i. $project"
-        i=$((i+1))
+        project_array+=("$project")
     done <<< "$projects"
+
+    # Ortak kısmı bul
+    common_prefix=$(find_common_prefix "${project_array[@]}")
+
+    # Proje isimlerini ortak kısmı çıkararak listele
+    i=1
+    for project in "${project_array[@]}"; do
+        project_name=${project#$common_prefix}
+        echo "$i. $project_name"
+        i=$((i+1))
+    done
     exit 0
 fi
 
@@ -48,7 +73,7 @@ else
 fi
 
 # Gerekli paketleri yükler
-REQUIRED_PACKAGES=("git" "node" "npm" "jq")
+REQUIRED_PACKAGES=("git" "node" "npm" "jq" "lazygit")
 for pkg in "${REQUIRED_PACKAGES[@]}"; do
   if ! brew list -1 | grep -q "^${pkg}\$"; then
     echo "Installing $pkg..."
