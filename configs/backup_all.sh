@@ -21,7 +21,25 @@ cp -r ~/.ssh ~/backup/configs
 cp ~/.npmrc ~/backup/configs
 cp ~/.yarnrc ~/backup/configs
 
-# Uygulama listesi
+# Uygulama listesi (doğru isimlerle)
+APPLICATIONS_FILE=~/backup/configs/applications_list.txt
+
+# Eski dosyayı sil
+if [ -f "$APPLICATIONS_FILE" ]; then
+  rm "$APPLICATIONS_FILE"
+fi
+
+# Boş bir dosya oluştur
+touch "$APPLICATIONS_FILE"
+
+# Uygulamaları bul ve listeye yaz
+echo "Yüklü uygulamalar listeleniyor..."
+for app in /Applications/*.app; do
+  app_name=$(basename "$app" .app | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+  echo "$app_name" >> "$APPLICATIONS_FILE"
+done
+
+# Homebrew paketleri
 brew tap homebrew/bundle
 brew bundle dump --file=~/backup/configs/Brewfile
 
