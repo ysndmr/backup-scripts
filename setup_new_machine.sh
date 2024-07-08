@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Parametre kontrolü
+SKIP_GITLAB=false
+SKIP_VSCODE=false
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --none) SKIP_GITLAB=true ;;
+        --no-vscode) SKIP_VSCODE=true ;;
+        *) echo "Bilinmeyen parametre: $1" ;;
+    esac
+    shift
+done
+
 # Homebrew'ü kurar
 if ! command -v brew &> /dev/null; then
   echo "Homebrew yükleniyor..."
@@ -50,29 +63,37 @@ else
   echo "Yapılandırma dosyaları zaten mevcut, atlanıyor."
 fi
 
-# VSCode uzantılarını ve temalarını yükler
-if [ -f ~/backup/configs/vscode_extensions_list.txt ]; then
-  echo "VSCode uzantıları yükleniyor..."
-  while IFS= read -r extension; do
-    code --install-extension "$extension" || echo "$extension yüklenemedi, atlanıyor."
-  done < ~/backup/configs/vscode_extensions_list.txt
+# VSCode uzantılarını ve ayarlarını yükler
+if [ "$SKIP_VSCODE" = false ]; then
+  if [ -f ~/backup/configs/vscode_extensions_list.txt ]; then
+    echo "VSCode uzantıları yükleniyor..."
+    while IFS= read -r extension; do
+      code --install-extension "$extension" || echo "$extension yüklenemedi, atlanıyor."
+    done < ~/backup/configs/vscode_extensions_list.txt
+  else
+    echo "VSCode uzantı listesi bulunamadı, atlanıyor."
+  fi
+
+  # VSCode ayarlarını geri yükler
+  echo "VSCode ayarları geri yükleniyor..."
+  cp ~/backup/configs/settings.json ~/Library/Application\ Support/Code/User/settings.json
+  cp ~/backup/configs/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
+  cp -r ~/backup/configs/snippets ~/Library/Application\ Support/Code/User/snippets
 else
-  echo "VSCode uzantı listesi bulunamadı, atlanıyor."
+  echo "VSCode uzantı ve ayarlarının yüklenmesi atlandı (--no-vscode parametresi kullanıldı)."
 fi
 
-# VSCode ayarlarını geri yükler
-echo "VSCode ayarları geri yükleniyor..."
-cp ~/backup/configs/settings.json ~/Library/Application\ Support/Code/User/settings.json
-cp ~/backup/configs/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
-cp -r ~/backup/configs/snippets ~/Library/Application\ Support/Code/User/snippets
-
-# GitLab projelerinin zaten klonlanıp klonlanmadığını kontrol eder ve gerekirse klonlar
-PROJECTS_DIR="$HOME/Desktop/Projects"
-if [ ! -d "$PROJECTS_DIR" ] || [ -z "$(ls -A "$PROJECTS_DIR")" ]; then
-  echo "GitLab projeleri klonlanıyor..."
-  ./configs/clone_gitlab_projects.sh
+# GitLab projelerinin klonlanmasını kontrol eder
+if [ "$SKIP_GITLAB" = false ]; then
+  PROJECTS_DIR="$HOME/Desktop/Projects"
+  if [ ! -d "$PROJECTS_DIR" ] || [ -z "$(ls -A "$PROJECTS_DIR")" ]; then
+    echo "GitLab projeleri klonlanıyor..."
+    ./configs/clone_gitlab_projects.sh
+  else
+    echo "GitLab projeleri zaten klonlanmış, atlanıyor."
+  fi
 else
-  echo "GitLab projeleri zaten klonlanmış, atlanıyor."
+  echo "GitLab projeleri klonlama atlandı (--none parametresi kullanıldı)."
 fi
 
 echo "Kurulum tamamlandı!"
