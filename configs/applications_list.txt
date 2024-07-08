@@ -1,8 +1,13 @@
+1password
+anydesk
+arc
 backblaze
+backblazerestore
 dbeaver
 docker
 firefox
 google-chrome
+safari
 slack
-iterm2
+iterm
 zoom
