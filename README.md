@@ -1,5 +1,107 @@
 # Backup Scripts
 
+[English](#english) | [Türkçe](#türkçe)
+
+## English
+
+This repository contains scripts that automate all the necessary installations and configurations when transitioning to a new computer.
+
+### Contents
+- configs/: Directory containing configuration files.
+- setup_new_machine.sh: Main script that performs all installations on a new computer.
+- configs/Brewfile: List of packages installed with Homebrew.
+- configs/applications_list.txt: List of installed applications.
+- configs/backup_all.sh: Script that backs up configuration files.
+- configs/clone_gitlab_projects.sh: Script that clones GitLab projects.
+
+## Installation Steps
+Follow these steps to perform the backup and installation process on a new computer:
+
+### 1. Clone the Repository
+Open the terminal on your new computer and clone this repository:
+
+```sh
+git clone https://github.com/ysndmr/backup-scripts.git ~/backup
+```
+
+### 2.  Run the Main Script
+Ensure that the script is executable:
+
+```sh
+chmod +x setup_new_machine.sh
+```
+Run the setup_new_machine.sh script to automatically perform all installations and configurations:
+
+
+```sh
+./setup_new_machine.sh
+```
+
+This script will perform the following steps:
+
+- Installs Homebrew.
+- Installs Git, Node.js, npm, and jq.
+- Installs the packages backed up with Homebrew using `Brewfile`.
+- Installs the applications listed in `applications_list.txt` with Homebrew.
+- Restores configuration files (using the `backup_all.sh` script).
+- Clones GitLab projects (using the `clone_gitlab_projects.sh` script).
+
+
+### Parameters
+
+The setup_new_machine.sh script can be run with the following parameters to skip certain steps or perform additional tasks:
+
+1. `--none`
+This parameter skips the GitLab projects cloning step.
+
+```sh
+./setup_new_machine.sh --none
+```
+
+2. `--no-vscode`
+This parameter skips the Visual Studio Code extensions and settings restoration step.
+
+```sh
+./setup_new_machine.sh --no-vscode
+```
+3. `--projects`
+This parameter lists the available projects in GitLab with numbered entries. After obtaining this list, you can decide which projects to skip.
+
+```sh
+./setup_new_machine.sh --projects
+```
+
+4. `--skip`
+This parameter skips cloning the projects with the specified numbers. The numbers correspond to the list obtained with the --projects parameter. Multiple numbers can be specified, separated by commas.
+
+```sh
+./setup_new_machine.sh --skip 1,2,3
+```
+Example Usage Scenario
+First, run the script with the --projects parameter to get a numbered list of projects:
+
+```sh
+./setup_new_machine.sh --projects
+```
+This will output a numbered list of projects. For example:
+
+
+```sh
+1. Group/Project1
+2. Group/Project2
+3. Group/Project3
+```
+Then, use the --skip parameter to skip cloning the projects you don't want:
+
+```sh
+./setup_new_machine.sh --skip 1,3
+```
+This command will skip cloning projects numbered 1 and 3.
+
+# Backup Scripts
+
+## Türkçe
+
 Bu depo, yeni bir bilgisayara geçiş yaparken gerekli tüm kurulumları ve yapılandırmaları otomatik olarak gerçekleştiren script'leri içerir.
 
 ## İçindekiler
@@ -92,4 +194,5 @@ Daha sonra, klonlamak istemediğiniz projeleri atlamak için --skip parametresin
 ./setup_new_machine.sh --skip 1,3
 ```
 Bu komut, 1 ve 3 numaralı projeleri klonlamadan atlayacaktır.
+
 
