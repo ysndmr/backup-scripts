@@ -3,11 +3,15 @@
 # Parametre kontrolü
 SKIP_GITLAB=false
 SKIP_VSCODE=false
+LIST_PROJECTS=false
+SKIP_PROJECTS=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --none) SKIP_GITLAB=true ;;
         --no-vscode) SKIP_VSCODE=true ;;
+        --projects) LIST_PROJECTS=true ;;
+        --skip) SKIP_PROJECTS="$2"; shift ;;
         *) echo "Bilinmeyen parametre: $1" ;;
     esac
     shift
@@ -84,11 +88,32 @@ else
 fi
 
 # GitLab projelerinin klonlanmasını kontrol eder
+PROJECTS_DIR="$HOME/Desktop/Projects"
 if [ "$SKIP_GITLAB" = false ]; then
-  PROJECTS_DIR="$HOME/Desktop/Projects"
+  if [ "$LIST_PROJECTS" = true ]; then
+    echo "GitLab projeleri listeleniyor..."
+    projects=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100" | jq -r '.[].name_with_namespace')
+    i=1
+    for project in $projects; do
+      echo "$i. $project"
+      i=$((i+1))
+    done
+    exit 0
+  fi
+
   if [ ! -d "$PROJECTS_DIR" ] || [ -z "$(ls -A "$PROJECTS_DIR")" ]; then
     echo "GitLab projeleri klonlanıyor..."
-    ./configs/clone_gitlab_projects.sh
+    projects=$(curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" "https://gitlab.com/api/v4/groups/$GITLAB_GROUP/projects?per_page=100" | jq -r '.[].ssh_url_to_repo')
+    i=1
+    for project in $projects; do
+      if [[ ",$SKIP_PROJECTS," != *",$i,"* ]]; then
+        echo "Klonlanıyor: $project"
+        git clone "$project" "$PROJECTS_DIR/$(basename $project .git)" || echo "$project klonlanamadı, atlanıyor."
+      else
+        echo "$i numaralı proje atlanıyor."
+      fi
+      i=$((i+1))
+    done
   else
     echo "GitLab projeleri zaten klonlanmış, atlanıyor."
   fi
