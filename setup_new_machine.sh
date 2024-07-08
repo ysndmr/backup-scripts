@@ -33,7 +33,7 @@ if [ -f ./configs/applications_list.txt ]; then
   while IFS= read -r application; do
     if ! brew list --cask -1 | grep -q "^${application}\$"; then
       echo "$application yükleniyor..."
-      brew install --cask "$application"
+      brew install --cask "$application" || echo "$application yüklenemedi, atlanıyor."
     else
       echo "$application zaten kurulu, atlanıyor."
     fi
@@ -49,6 +49,22 @@ if [ ! -f "$HOME/.zshrc" ] || [ ! -f "$HOME/.gitconfig" ]; then
 else
   echo "Yapılandırma dosyaları zaten mevcut, atlanıyor."
 fi
+
+# VSCode uzantılarını ve temalarını yükler
+if [ -f ~/backup/configs/vscode_extensions_list.txt ]; then
+  echo "VSCode uzantıları yükleniyor..."
+  while IFS= read -r extension; do
+    code --install-extension "$extension" || echo "$extension yüklenemedi, atlanıyor."
+  done < ~/backup/configs/vscode_extensions_list.txt
+else
+  echo "VSCode uzantı listesi bulunamadı, atlanıyor."
+fi
+
+# VSCode ayarlarını geri yükler
+echo "VSCode ayarları geri yükleniyor..."
+cp ~/backup/configs/settings.json ~/Library/Application\ Support/Code/User/settings.json
+cp ~/backup/configs/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
+cp -r ~/backup/configs/snippets ~/Library/Application\ Support/Code/User/snippets
 
 # GitLab projelerinin zaten klonlanıp klonlanmadığını kontrol eder ve gerekirse klonlar
 PROJECTS_DIR="$HOME/Desktop/Projects"
