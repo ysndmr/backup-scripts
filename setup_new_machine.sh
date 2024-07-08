@@ -73,7 +73,7 @@ else
 fi
 
 # Gerekli paketleri yükler
-REQUIRED_PACKAGES=("git" "node" "npm" "jq" "lazygit")
+REQUIRED_PACKAGES=("git" "node" "npm" "jq" "lazygit" "fzf" "autojump" "fd" "the_silver_searcher" "ripgrep")
 for pkg in "${REQUIRED_PACKAGES[@]}"; do
   if ! brew list -1 | grep -q "^${pkg}\$"; then
     echo "Installing $pkg..."
@@ -107,12 +107,12 @@ else
 fi
 
 # Yapılandırma dosyalarını geri yükler
-if [ ! -f "$HOME/.zshrc" ] || [ ! -f "$HOME/.gitconfig" ]; then
-  echo "Restoring configuration files..."
-  ./configs/backup_all.sh
-else
-  echo "Configuration files already exist, skipping."
-fi
+echo "Restoring configuration files..."
+cp ~/backup/configs/.zshrc ~/
+cp ~/backup/configs/.gitconfig ~/
+cp ~/backup/configs/.zprofile ~/
+cp ~/backup/configs/.npmrc ~/
+cp ~/backup/configs/.yarnrc ~/
 
 # VSCode uzantılarını ve ayarlarını yükler
 if [ "$SKIP_VSCODE" = false ]; then
@@ -133,6 +133,23 @@ if [ "$SKIP_VSCODE" = false ]; then
 else
   echo "VSCode extensions and settings restoration skipped (--no-vscode parameter used)."
 fi
+
+# Oh My Zsh ve yapılandırmalarını geri yükler
+echo "Restoring Oh My Zsh and configurations..."
+cp -r ~/backup/configs/.oh-my-zsh ~/
+cp ~/backup/configs/.p10k.zsh ~/
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+
+# Zsh eklentilerini yükler
+echo "Installing Zsh plugins..."
+git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+git clone https://github.com/lukechilds/zsh-better-npm-completion ~/.oh-my-zsh/custom/plugins/zsh-better-npm-completion
+git clone https://github.com/changyuheng/zsh-interactive-cd ~/.oh-my-zsh/custom/plugins/zsh-interactive-cd
+
+# Zsh yapılandırmasını yeniden yükle
+echo "Loading Zsh configuration..."
+source ~/.zshrc
 
 # GitLab projelerinin klonlanmasını kontrol eder
 PROJECTS_DIR="$HOME/Desktop/Projects"
